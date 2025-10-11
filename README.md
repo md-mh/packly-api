@@ -4,6 +4,36 @@ This repository provides a simple Node.js backend for content management, includ
 
 ---
 
+## 🗄️ About `packlydb.sql`
+
+The `packlydb.sql` file in this repository contains the complete SQL schema for the application's database. It is intended for initializing the MySQL database used by the backend.
+
+### What's inside?
+
+- **Table Definitions**:
+
+  - `auth`: Stores user authentication info like username, email, password, role, and pins.
+  - `content`: Stores content types (text, banners, cards, etc.) with title, image, order, ability.
+  - `login_activity`: Tracks user logins for audit and security purposes.
+  - `users`: Stores user profile information linked to `auth`.
+
+- **Indexes**: Each table includes indexes or primary keys for fast lookup and data integrity.
+
+- **Auto-increment Settings**: Ensures unique IDs are automatically generated for new records.
+
+- **Example Data**: May include sample rows to populate your database with demo data.
+
+### How To Use
+
+1. Create a new MySQL database if you don’t have one already.
+2. Run the contents of `packlydb.sql` using a MySQL client or through phpMyAdmin. This will set up the whole database schema and initial data.
+   ```bash
+   mysql -u your_db_user -p your_database < packlydb.sql
+   ```
+3. Update your connection settings in `src/utils/setting.js` to point to your running database.
+
+> **Tip:** This database file is crucial for local development and first setup of the backend API!
+
 ## 🚀 How to Run
 
 1. **Install dependencies**
@@ -20,10 +50,6 @@ This repository provides a simple Node.js backend for content management, includ
    ```bash
    npm start
    ```
-   Or, for development with restart on changes:
-   ```bash
-   npm run dev
-   ```
 
 ---
 
@@ -31,7 +57,7 @@ This repository provides a simple Node.js backend for content management, includ
 
 ### Fetch All Content (with pagination and filtering)
 
-**GET** `/content`
+**GET** `/content/all`
 
 - **Query params:**
   - `type`: filter by type (optional)
@@ -59,9 +85,29 @@ This repository provides a simple Node.js backend for content management, includ
 
 ---
 
+### Add New Content
+
+**POST** `/content/add`
+
+- **Body:**
+
+  - `type` (required): The type of content (`text`, `banner`, or `card`)
+  - `title` (required): Title of the content
+  - `image` (optional): Image URL (for banners/cards)
+  - `order` (optional): Order or position of the content
+  - `ability` (optional): Additional data or permissions (if applicable)
+  - `extra_data` (optional): Any extra JSON data
+
+- **Response:**
+  - `success` (boolean)
+  - `message` (string)
+  - `result` (created content object)
+
+---
+
 ### Update Content
 
-**PUT** `/content`
+**PUT** `/content/update`
 
 - **Body:**
   - `id` (required)

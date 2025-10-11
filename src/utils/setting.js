@@ -6,32 +6,25 @@ const isProduction = process.env.NODE_ENV === "production";
 
 // API and domain configuration
 const api = isProduction
-  ? "https://t.exhortdesign.com/"
+  ? "https://packly.exhortdesign.com/"
   : "http://localhost:5000";
 const domain = isProduction
-  ? "https://t.exhortdesign.com"
+  ? "https://packly.exhortdesign.com"
   : "http://localhost:3000";
 const company = "packly";
 
 // Mail configuration
-const mailHost = "mail.exhortdesign.com";
-const mailFrom = "test@exhortdesign.com";
-const mailPass = "R&-ZDr~M1Uig";
+const mailHost = process.env.NODE_MAIL_HOST;
+const mailFrom = process.env.NODE_MAIL_FROM;
+const mailPass = process.env.NODE_MAIL_PASS;
 
 // Database configuration
-const dbConfig = isProduction
-  ? {
-      host: "localhost",
-      user: "exhortde_packly_user",
-      password: "cAaY?adQ)B;XV,t!",
-      database: "exhortde_packlydb",
-    }
-  : {
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "packly",
-    };
+const dbConfig = {
+  host: process.env.NODE_DB_HOST,
+  user: process.env.NODE_DB_USER,
+  password: process.env.NODE_DB_PASS,
+  database: process.env.NODE_DB_DATABASE,
+};
 
 const db = mysql.createConnection(dbConfig);
 
