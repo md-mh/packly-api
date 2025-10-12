@@ -14,9 +14,6 @@ const domain = isProduction
 const company = "Packly";
 
 // Mail configuration
-// const mailHost = process.env.MAIL_HOST;
-// const mailFrom = process.env.MAIL_FROM;
-// const mailPass = process.env.MAIL_PASS;
 const mailHost = "mail.exhortdesign.com";
 const mailFrom = "test@exhortdesign.com";
 const mailPass = "R&-ZDr~M1Uig";
@@ -28,10 +25,6 @@ const dbConfig = isProduction
       user: "exhortde_packly_user",
       password: "H5d2OP6nYi+aL6y8",
       database: "exhortde_packlydb",
-      // host: process.env.DB_HOST,
-      // user: process.env.DB_USER,
-      // password: process.env.DB_PASS,
-      // database: process.env.DB_DATABASE,
     }
   : {
       host: "localhost",
