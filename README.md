@@ -27,12 +27,7 @@ The `packlydb.sql` file in this repository contains the complete SQL schema for 
 
 1. Create a new MySQL database if you don’t have one already.
 2. Run the contents of `packlydb.sql` using a MySQL client or through phpMyAdmin. This will set up the whole database schema and initial data.
-   ```bash
-   mysql -u your_db_user -p your_database < packlydb.sql
-   ```
 3. Update your connection settings in `src/utils/setting.js` to point to your running database.
-
-> **Tip:** This database file is crucial for local development and first setup of the backend API!
 
 ## 🚀 How to Run
 
@@ -87,7 +82,7 @@ All endpoints are defined in [`/src/controller/routes.js`](src/controller/routes
 ### Ordering and Bulk Reordering
 
 - **Dynamic reordering**
-  - `PATCH /content/reorder`
+  - `PATCH /content/bulk-orders`
   - Supports bulk reordering of multiple content items by accepting an array of `{id, order}` pairs in the request body. Ensures no conflicts (e.g., duplicate orders) and adjusts sequences as needed.
 - **Conflict and Sequence Handling**
   - All order change endpoints ensure that after reorder operations, the sequence is continuous and free of duplicates or gaps.

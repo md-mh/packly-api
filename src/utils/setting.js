@@ -1,16 +1,9 @@
 const mysql = require("mysql");
 const nodemailer = require("nodemailer");
 
-// Environment-based configuration
-const isProduction = process.env.NODE_ENV === "production";
-
 // API and domain configuration
-const api = isProduction
-  ? "https://packly.exhortdesign.com/"
-  : "http://localhost:5000";
-const domain = isProduction
-  ? "https://packly.exhortdesign.com"
-  : "http://localhost:3000";
+const api = "http://localhost:5000";
+const domain = "http://localhost:3000";
 const company = "Packly";
 
 // Mail configuration
@@ -19,19 +12,12 @@ const mailFrom = "test@exhortdesign.com";
 const mailPass = "R&-ZDr~M1Uig";
 
 // Database configuration
-const dbConfig = isProduction
-  ? {
-      host: "localhost",
-      user: "exhortde_packly_user",
-      password: "H5d2OP6nYi+aL6y8",
-      database: "exhortde_packlydb",
-    }
-  : {
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "packly",
-    };
+const dbConfig = {
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "packly",
+};
 
 let db;
 
