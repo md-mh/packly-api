@@ -4,6 +4,20 @@ This repository provides a simple Node.js backend for content management, includ
 
 ---
 
+## 📝 Design Decisions: Content Structure
+
+- **Content Type as Enum**: The `type` field acts as an enum, defining the category—either `text`, `banner`, or `card`. This makes it easy to identify and manage content types programmatically.
+- **Type-specific Fields**:
+  - For `text` content, only the `title` is required.
+  - For `banner`, only the `image` is required.
+  - For `card`, both `title` and `image` are required.
+- **Flexible Extra Data**: An `extra_data` field (stored as JSON) captures any additional, type-specific or future-proof information, supporting extensibility without schema changes.
+- **Display and Sorting**: The `order` field lets you control the display arrangement of content items.
+- **Ability Flag**: A Boolean/int `ability` indicates whether a content item is enabled/disabled, supporting feature toggling or content status tracking.
+- **Ownership Tracking**: The `auth_id` field records which user added each content item, ensuring clear attribution and auditability.
+
+This design ensures clarity, validation per content type, extensibility, and accountability for content management operations.
+
 ## 🗄️ About `packlydb.sql`
 
 The `packlydb.sql` file in this repository contains the complete SQL schema for the application's database. It is intended for initializing the MySQL database used by the backend.
