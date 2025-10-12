@@ -65,7 +65,7 @@ All endpoints are defined in [`/src/controller/routes.js`](src/controller/routes
 - **Retrieve all content**
   - `GET /content/all`
   - Fetches all content items, ordered by their `order` field.
-  - Supports query parameters for pagination (`?page=1&limit=10`), filtering by type (`?type=text`) and ability (`?ability=active`).
+  - Supports query parameters for pagination (`?page=1&limit=10`), filtering by type (`?type=text`).
 - **Retrieve a single content item**
   - `GET /content/:id`
   - Fetches a content item by its unique identifier. If the ID does not exist or is invalid, returns 404 with a meaningful error message.
