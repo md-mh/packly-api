@@ -11,31 +11,55 @@ const api = isProduction
 const domain = isProduction
   ? "https://packly.exhortdesign.com"
   : "http://localhost:3000";
-const company = "packly";
+const company = "Packly";
 
 // Mail configuration
-const mailHost = process.env.NODE_MAIL_HOST;
-const mailFrom = process.env.NODE_MAIL_FROM;
-const mailPass = process.env.NODE_MAIL_PASS;
+const mailHost = process.env.MAIL_HOST;
+const mailFrom = process.env.MAIL_FROM;
+const mailPass = process.env.MAIL_PASS;
 
 // Database configuration
-const dbConfig = {
-  host: process.env.NODE_DB_HOST,
-  user: process.env.NODE_DB_USER,
-  password: process.env.NODE_DB_PASS,
-  database: process.env.NODE_DB_DATABASE,
-};
+const dbConfig = isProduction
+  ? {
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_DATABASE,
+    }
+  : {
+      host: "localhost",
+      user: "root",
+      password: "",
+      database: "packly",
+    };
 
-const db = mysql.createConnection(dbConfig);
+let db;
 
-const transport = nodemailer.createTransport({
-  host: mailHost,
-  port: 465,
-  secure: true,
-  auth: {
-    user: mailFrom,
-    pass: mailPass,
-  },
+db = mysql.createConnection(dbConfig);
+
+db.connect((err) => {
+  if (err) {
+    console.error("Error connecting to the database:", err);
+    process.exit(1);
+  } else {
+    console.log("Connected to the MySQL database");
+  }
 });
+
+let transport;
+try {
+  transport = nodemailer.createTransport({
+    host: mailHost,
+    port: 465,
+    secure: true,
+    auth: {
+      user: mailFrom,
+      pass: mailPass,
+    },
+  });
+} catch (err) {
+  console.error("Error creating nodemailer transport:", err);
+  transport = null;
+}
 
 module.exports = { api, domain, company, db, mailFrom, transport };

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const http = require("http");
+const dotenv = require("dotenv");
 const socketIO = require("socket.io");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
@@ -15,7 +16,7 @@ const server = http.createServer(app);
 const io = socketIO(server);
 
 app.use(cors());
-
+dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
 
