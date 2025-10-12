@@ -53,111 +53,68 @@ The `packlydb.sql` file in this repository contains the complete SQL schema for 
 
 ---
 
-## 📖 API Endpoints
+## Project Feature Overview
 
-### Fetch All Content (with pagination and filtering)
+This project fully implements a content management backend with the following requirements:
 
-**GET** `/content/all`
+### Content Management
 
-- **Query params:**
-  - `type`: filter by type (optional)
-  - `search`: keyword to search in titles (optional)
-  - `page`: page number (default: 1)
-  - `limit`: number of items per page (default: 12)
-- **Response**:
-  - `success` (boolean)
-  - `message` (string)
-  - `data` (array of content)
-  - `pagination` (pagination info)
+- **Support multiple content types**: The backend handles different content types (text, banner, card, etc.) via the `content` table (see database schema in `packlydb.sql`).
+- **Order/Sequence Handling**: Each content item includes an `order` field to control its display sequence in the UI and APIs.
+- **Activate/Deactivate Content**: Each item has an `ability` (or similar) field allowing it to be activated/deactivated.
 
----
+### API Endpoints
 
-### Fetch Content by ID
+All endpoints are defined in [`/src/controller/routes.js`](src/controller/routes.js), exposed via the Express app (`app.js`):
 
-**GET** `/content/:id`
+- **Retrieve all content**
+  - `GET /content/all`
+  - Fetches all content items, ordered by their `order` field.
+  - Supports query parameters for pagination (`?page=1&limit=10`), filtering by type (`?type=text`) and ability (`?ability=active`).
+- **Retrieve a single content item**
+  - `GET /content/:id`
+  - Fetches a content item by its unique identifier. If the ID does not exist or is invalid, returns 404 with a meaningful error message.
+- **Create new content**
+  - `POST /content/add`
+  - Accepts content data in the request body. Validates all required fields; returns status code with missing/invalid inputs.
+- **Update an existing content item**
+  - `PUT /content/:id`
+  - Updates a given content item by its identifier. Validates input and returns appropriate errors for non-existent items or invalid data.
+- **Delete content**
+  - `DELETE /content/:id`
+  - Deletes a content item. Returns a 404 error if the item does not exist.
 
-- **Path params:**
-  - `id`: content ID
-- **Response**:
-  - `success` (boolean)
-  - `message` (string)
-  - `data` (content object)
+### Ordering and Bulk Reordering
 
----
+- **Dynamic reordering**
+  - `PATCH /content/reorder`
+  - Supports bulk reordering of multiple content items by accepting an array of `{id, order}` pairs in the request body. Ensures no conflicts (e.g., duplicate orders) and adjusts sequences as needed.
+- **Conflict and Sequence Handling**
+  - All order change endpoints ensure that after reorder operations, the sequence is continuous and free of duplicates or gaps.
 
-### Add New Content
+### Edge Case Handling
 
-**POST** `/content/add`
+- **Invalid identifiers**: Endpoints like `GET /content/:id`, `PUT /content/:id`, and `DELETE /content/:id` validate the identifier and return 400/404 on error.
+- **Invalid query parameters**: Listing endpoints validate query/sort options, rejecting invalid sort directions or unknown parameters with a 400 error.
+- **Validation**: Creation and update endpoints return a 422 status for empty or missing required fields, with clear error feedback.
+- **Non-existent deletions**: `DELETE /content/:id` returns 404 if the item does not exist.
 
-- **Body:**
+### Pagination and Filtering
 
-  - `type` (required): The type of content (`text`, `banner`, or `card`)
-  - `title` (required): Title of the content
-  - `image` (optional): Image URL (for banners/cards)
-  - `order` (optional): Order or position of the content
-  - `ability` (optional): Additional data or permissions (if applicable)
-  - `extra_data` (optional): Any extra JSON data
+- The `GET /content/all` endpoint accepts pagination via `page` and `limit` query parameters, as well as filtering (e.g., by content type, ability).
 
-- **Response:**
-  - `success` (boolean)
-  - `message` (string)
-  - `result` (created content object)
+### Role-Based Access Control
 
----
+- Middleware in [`/src/hooks/checkUser.js`](src/hooks/checkUser.js) restricts certain endpoints (e.g., creation, update, delete, reorder) to users with the appropriate roles/permissions.
 
-### Update Content
+### Industry Standards & API Documentation
 
-**PUT** `/content/update`
-
-- **Body:**
-  - `id` (required)
-  - `type` (required)
-  - `title`, `image`, `order`, `ability`, `extra_data` (as required by type)
-- **Response**:
-  - `success` (boolean)
-  - `message` (string)
-  - `result` (update result info)
+- **RESTful design**: HTTP verbs and resource URIs follow REST best practices.
+- **Status codes**: Returns 200 for success, 201 for creation, 400 for bad requests, 404 for not found, 422 for validation errors, etc.
+- **Error messages**: All errors include meaningful, user-friendly messages.
+- **Clean code**: Modular Express design using controllers and middleware (see `app.js` and `/src/controller/routes.js`).
+- **Swagger/OpenAPI documentation**: Complete, up-to-date docs available at [`GET /api-docs`](http://localhost:5000/api-docs) or the deployed base URL, with details and try-it-out features for every endpoint.
 
 ---
 
-### Delete Content
-
-**DELETE** `/content/:id`
-
-- **Path params:**
-  - `id`: content ID
-- **Response**:
-  - `success` (boolean)
-  - `message` (string)
-  - `result` (delete result info)
-
----
-
-### Bulk Update Content Orders
-
-**PUT** `/content/bulk-orders`
-
-- **Body:**  
-  An array of objects, each with:
-  - `id` (string): The content entry's ID (required)
-  - `order` (number): The new order value (required)
-  ```
-  [
-    { "id": "content_id_1", "order": 2 },
-    { "id": "content_id_2", "order": 1 }
-  ]
-  ```
-- **Response:**
-  - `success` (boolean)
-  - `message` (string)
-  - `result` (database update result info)
-  - `invalidItem` (if any invalid item is found in the input; for 400 response)
-
-## ⚠️ Notes
-
-- Ensure your database is running and accessible with the correct schema/table.
-- All routes return clear messages and error information where appropriate (e.g., 404 or 500 errors).
-
-For further customization, review code in `/src/controller/content/`.
-
----
+Refer to the source in [`app.js`](app.js), [`src/controller/routes.js`](src/controller/routes.js), and the included Swagger/OpenAPI docs (`/api-docs`) to explore and test each endpoint and feature.

@@ -2,7 +2,7 @@ name: Deploy Node.js to cPanel
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
 
 jobs:
   build-and-deploy:
