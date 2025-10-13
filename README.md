@@ -1,129 +1,112 @@
 # Content API Documentation
 
-This repository provides a simple Node.js backend for content management, including endpoints to **fetch**, **update**, and **delete** content from a database.
+This repository contains a Node.js backend for content management, providing endpoints to **fetch**, **update**, **reorder**, and **delete** content stored in a MySQL database.
 
 ---
 
-## 📝 Design Decisions: Content Structure
+## 📝 Content Structure & Design Decisions
 
-- **Content Type as Enum**: The `type` field acts as an enum, defining the category—either `text`, `banner`, or `card`. This makes it easy to identify and manage content types programmatically.
-- **Type-specific Fields**:
-  - For `text` content, only the `title` is required.
-  - For `banner`, only the `image` is required.
-  - For `card`, both `title` and `image` are required.
-- **Flexible Extra Data**: An `extra_data` field (stored as JSON) captures any additional, type-specific or future-proof information, supporting extensibility without schema changes.
-- **Display and Sorting**: The `order` field lets you control the display arrangement of content items.
-- **Ability Flag**: A Boolean/int `ability` indicates whether a content item is enabled/disabled, supporting feature toggling or content status tracking.
-- **Ownership Tracking**: The `auth_id` field records which user added each content item, ensuring clear attribution and auditability.
+- **Content Type (`type` as ENUM)**: The `type` field determines the content category. Currently, supported types are `text`, `banner`, and `card`. This allows consistent handling and easy extension of content categories.
+- **Type-Specific Requirements**:
+  - `text`: Requires a `title`.
+  - `banner`: Requires an `image`.
+  - `card`: Requires both `title` and `image`.
+- **Extra Data (`extra_data`)**: The optional `extra_data` field (stored as JSON) enables future extensibility, accommodating additional properties without altering the main schema.
+- **Display Order**: `order` field defines the sequence for displaying content.
+- **Ability Flag**: `ability` (boolean or integer) flags content as enabled or disabled for toggling and status management.
+- **Ownership (`auth_id`)**: Tracks the user responsible for creating each content item, supporting attribution and auditing.
 
-This design ensures clarity, validation per content type, extensibility, and accountability for content management operations.
+This structure ensures strong validation, type awareness, and future scalability.
 
-## 🗄️ About `packlydb.sql`
+## 🗄️ Database: `packlydb.sql`
 
-The `packlydb.sql` file in this repository contains the complete SQL schema for the application's database. It is intended for initializing the MySQL database used by the backend.
+The `packlydb.sql` file provides the full MySQL database schema for this backend.
 
-### What's inside?
+#### Included Tables:
+
+- `auth`: Handles user authentication — username, email, password, role, pins.
+- `content`: Manages all content items, with fields for type, title, image, order, ability, extra_data, etc.
+- `login_activity`: Logs user login history for security review.
+- `users`: Stores additional profile info for each user, linked to `auth`.
 
 - **Table Definitions**:
 
-  - `auth`: Stores user authentication info like username, email, password, role, and pins.
-  - `content`: Stores content types (text, banners, cards, etc.) with title, image, order, ability.
-  - `login_activity`: Tracks user logins for audit and security purposes.
-  - `users`: Stores user profile information linked to `auth`.
+#### Database Setup
 
-- **Indexes**: Each table includes indexes or primary keys for fast lookup and data integrity.
+1. Create a new MySQL database.
+2. Import `packlydb.sql` (use a MySQL command-line client or phpMyAdmin).
+3. Edit your connection settings in `src/utils/setting.js` to match your local environment.
 
-- **Auto-increment Settings**: Ensures unique IDs are automatically generated for new records.
-
-- **Example Data**: May include sample rows to populate your database with demo data.
-
-### How To Use
-
-1. Create a new MySQL database if you don’t have one already.
-2. Run the contents of `packlydb.sql` using a MySQL client or through phpMyAdmin. This will set up the whole database schema and initial data.
-3. Update your connection settings in `src/utils/setting.js` to point to your running database.
-
-## 🚀 How to Run
+## 🚀 Getting Started
 
 1. **Install dependencies**
-
    ```bash
    npm install
    ```
-
-2. **Configure your database**
-
-   - Update your database connection settings in `src/utils/setting.js` as needed.
-
-3. **Start the server**
+2. **Database configuration**
+   - Update `src/utils/setting.js` with your MySQL credentials.
+3. **Run the server**
    ```bash
    npm start
    ```
 
 ---
 
-## Project Feature Overview
-
-This project fully implements a content management backend with the following requirements:
+## Feature Overview
 
 ### Content Management
 
-- **Support multiple content types**: The backend handles different content types (text, banner, card, etc.) via the `content` table (see database schema in `packlydb.sql`).
-- **Order/Sequence Handling**: Each content item includes an `order` field to control its display sequence in the UI and APIs.
-- **Activate/Deactivate Content**: Each item has an `ability` (or similar) field allowing it to be activated/deactivated.
+- **Supports Multiple Types**: Handles `text`, `banner`, `card`, and easily extendable for more.
+- **Flexible Ordering**: The `order` field sets display sequence for all content items.
+- **Enable/Disable**: Use the `ability` field to toggle visibility or status.
 
-### API Endpoints
+### API Endpoints Overview
 
-All endpoints are defined in [`/src/controller/routes.js`](src/controller/routes.js), exposed via the Express app (`app.js`):
+_All endpoints implemented in [`src/controller/routes.js`](src/controller/routes.js) and registered by the Express app (`app.js`)._
 
-- **Retrieve all content**
-  - `GET /content/all`
-  - Fetches all content items, ordered by their `order` field.
-  - Supports query parameters for pagination (`?page=1&limit=10`), filtering by type (`?type=text`).
-- **Retrieve a single content item**
-  - `GET /content/:id`
-  - Fetches a content item by its unique identifier. If the ID does not exist or is invalid, returns 404 with a meaningful error message.
-- **Create new content**
-  - `POST /content/add`
-  - Accepts content data in the request body. Validates all required fields; returns status code with missing/invalid inputs.
-- **Update an existing content item**
-  - `PUT /content/:id`
-  - Updates a given content item by its identifier. Validates input and returns appropriate errors for non-existent items or invalid data.
-- **Delete content**
-  - `DELETE /content/:id`
-  - Deletes a content item. Returns a 404 error if the item does not exist.
+- **GET /content/all**  
+  Returns all content items, ordered by `order`.
+  - Supports: `?page`, `?limit`, `?type`
+- **GET /content/:id**  
+  Returns a single content item by its ID.
+  - 404 returned if not found or invalid.
+- **POST /content/add**  
+  Creates new content.
+  - Requires valid fields depending on type.
+- **PUT /content/:id**  
+  Updates an existing content item.
+  - 404 if not found; 422 for invalid input.
+- **DELETE /content/:id**  
+  Deletes an item by ID.
+  - 404 if not found.
+- **PATCH /content/bulk-orders**  
+  Bulk update the `order` of multiple items by `{id, order}` in request body.
+  - Handles gaps and duplicates, enforces continuous sequence.
 
-### Ordering and Bulk Reordering
+### Ordering & Reordering
 
-- **Dynamic reordering**
-  - `PATCH /content/bulk-orders`
-  - Supports bulk reordering of multiple content items by accepting an array of `{id, order}` pairs in the request body. Ensures no conflicts (e.g., duplicate orders) and adjusts sequences as needed.
-- **Conflict and Sequence Handling**
-  - All order change endpoints ensure that after reorder operations, the sequence is continuous and free of duplicates or gaps.
+- Bulk ordering ensures no duplicate or missing `order` values post-operation.
+- Backend checks prevent conflicts.
 
-### Edge Case Handling
+### Edge Case & Error Handling
 
-- **Invalid identifiers**: Endpoints like `GET /content/:id`, `PUT /content/:id`, and `DELETE /content/:id` validate the identifier and return 400/404 on error.
-- **Invalid query parameters**: Listing endpoints validate query/sort options, rejecting invalid sort directions or unknown parameters with a 400 error.
-- **Validation**: Creation and update endpoints return a 422 status for empty or missing required fields, with clear error feedback.
-- **Non-existent deletions**: `DELETE /content/:id` returns 404 if the item does not exist.
+- Clear 400/404 errors for invalid or missing IDs.
+- 400 for bad query params (e.g., invalid sort).
+- 422 for failed validation (missing required fields).
+- Non-existent resource on deletion yields 404.
 
-### Pagination and Filtering
+### Pagination & Filtering
 
-- The `GET /content/all` endpoint accepts pagination via `page` and `limit` query parameters, as well as filtering (e.g., by content type, ability).
+- `GET /content/all` supports `page`, `limit`, and filtering by content type or title.
 
 ### Role-Based Access Control
 
 - Middleware in [`/src/hooks/checkUser.js`](src/hooks/checkUser.js) restricts certain endpoints (e.g., creation, update, delete, reorder) to users with the appropriate roles/permissions.
 
-### Industry Standards & API Documentation
+### API Documentation
 
-- **RESTful design**: HTTP verbs and resource URIs follow REST best practices.
-- **Status codes**: Returns 200 for success, 201 for creation, 400 for bad requests, 404 for not found, 422 for validation errors, etc.
-- **Error messages**: All errors include meaningful, user-friendly messages.
-- **Clean code**: Modular Express design using controllers and middleware (see `app.js` and `/src/controller/routes.js`).
-- **Swagger/OpenAPI documentation**: Complete, up-to-date docs available at [`GET /api-docs`](http://localhost:5000/api-docs) or the deployed base URL, with details and try-it-out features for every endpoint.
+- Complete and self-updating Swagger/OpenAPI docs at [`GET /api-docs`](http://localhost:5000/api-docs).
 
 ---
 
-Refer to the source in [`app.js`](app.js), [`src/controller/routes.js`](src/controller/routes.js), and the included Swagger/OpenAPI docs (`/api-docs`) to explore and test each endpoint and feature.
+Refer to the source in [`app.js`](app.js), [`src/controller/routes.js`](src/controller/routes.js), and the included Swagger/OpenAPI docs [`/api-docs`](http://localhost:5000/api-docs) to explore and test each endpoint and feature.
