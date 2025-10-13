@@ -106,7 +106,7 @@ _All endpoints implemented in [`src/controller/routes.js`](src/controller/routes
 
 ### API Documentation
 
-- Complete and self-updating Swagger/OpenAPI docs at [`GET /api-docs`](http://localhost:5000/api-docs).
+- Complete and self-updating Swagger docs at [`GET /api-docs`](http://localhost:5000/api-docs).
 
 ---
 
