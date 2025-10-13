@@ -75,7 +75,7 @@ _All endpoints implemented in [`src/controller/routes.js`](src/controller/routes
   - Requires valid fields depending on type.
 - **PUT /content/:id**  
   Updates an existing content item.
-  - 404 if not found; 422 for invalid input.
+  - 404 if not found; 400 for invalid input.
 - **DELETE /content/:id**  
   Deletes an item by ID.
   - 404 if not found.
@@ -90,10 +90,11 @@ _All endpoints implemented in [`src/controller/routes.js`](src/controller/routes
 
 ### Edge Case & Error Handling
 
-- Clear 400/404 errors for invalid or missing IDs.
-- 400 for bad query params (e.g., invalid sort).
-- 422 for failed validation (missing required fields).
-- Non-existent resource on deletion yields 404.
+- Returns clear 400 errors for missing or invalid required fields.
+- Returns 404 for requests with non-existent or invalid IDs.
+- Returns 400 for invalid query parameters (such as unsupported sort values).
+- Returns 500 for server or database errors, with relevant error messages.
+- Deleting a non-existent resource returns a 404 error.
 
 ### Pagination & Filtering
 
@@ -109,4 +110,4 @@ _All endpoints implemented in [`src/controller/routes.js`](src/controller/routes
 
 ---
 
-Refer to the source in [`app.js`](app.js), [`src/controller/routes.js`](src/controller/routes.js), and the included Swagger/OpenAPI docs [`/api-docs`](http://localhost:5000/api-docs) to explore and test each endpoint and feature.
+Refer to the source in [`app.js`](app.js), [`src/controller/routes.js`](src/controller/routes.js), and the included Swagger docs [`/api-docs`](http://localhost:5000/api-docs) to explore and test each endpoint and feature.
